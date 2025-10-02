@@ -1,0 +1,50 @@
+{% extends "baseusuarios.html" %}  
+{% block title %}Listado de Categorías{% endblock %}
+
+{% block contenido %} 
+<div class="container mt-4">
+    <h2>LISTADO DE CATEGORÍAS</h2>
+    
+
+
+    {% if categorias %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for categoria in categorias %}
+            <tr>
+                <td>{{ categoria.nombre }}</td>
+                <td>
+                    {% if categoria.estado == 1 %}
+                        <span class="badge bg-success">ACTIVA</span>
+                    {% else %}
+                        <span class="badge bg-danger">INACTIVA</span>
+                    {% endif %}
+                </td>
+                <td>{{ categoria.creacion|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'productos:editarcategoria' pk=categoria.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
+                    <button class="btn btn-danger btn-sm" disabled>ELIMINAR</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="alert alert-info">No hay categorías registradas.</p>
+    {% endif %}
+
+
+    <a href="{% url 'productos:crearcategoria' %}" class="btn btn-success mb-3">
+        CREAR NUEVA CATEGORÍA
+    </a>
+</div>
+
+{% endblock contenido %}

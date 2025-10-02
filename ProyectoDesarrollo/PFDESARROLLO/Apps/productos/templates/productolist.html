@@ -1,0 +1,56 @@
+{% extends "baseusuarios.html" %}  
+{% block title %}Listado de Productos{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h2>LISTADO DE PRODUCTOS</h2>
+
+    {% if productos %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Imagen</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.id_categoria.nombre|default:"Sin Categoría" }}</td> 
+                <td>${{ producto.precio }}</td>
+                <td>{{ producto.stock }}</td>
+                <td>{{ producto.imagen|default:"N/A"|slice:":20" }}...</td> <td>
+                    {% if producto.estado == 1 %}
+                        <span class="badge bg-success">ACTIVO</span>
+                    {% else %}
+                        <span class="badge bg-danger">INACTIVO</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'productos:editarproducto' pk=producto.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
+                    <button class="btn btn-danger btn-sm" disabled>ELIMINAR</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="alert alert-info">No hay productos registrados.</p>
+    {% endif %}
+
+
+    <a href="{% url 'productos:crearproductos' %}" class="btn btn-success mb-3">
+        CREAR NUEVO PRODUCTO
+    </a>
+    
+    <a href="{% url 'productos:listacategoria' %}" class="btn btn-info mb-3">
+        GESTIONAR CATEGORÍAS
+    </a>
+</div>
+{% endblock contenido %}

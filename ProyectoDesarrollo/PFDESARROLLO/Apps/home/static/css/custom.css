@@ -1,0 +1,11 @@
+.background-pattern {
+    background-image: url('/static/images/background-pattern.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.banner-ad-image {
+    background: url('../images/ad-image-1.png') no-repeat;
+    background-size: contain; /* Ajusta el tamaño de la imagen */
+    background-position: right center; /* Centra verticalmente y alinea a la derecha */
+}
