@@ -1,0 +1,103 @@
+{% extends 'baseusuarios.html' %} 
+{% load static %}
+
+{% block title %}Editar Pedido #{{ pedido.pk }}{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-4">
+        <h1>Editar Pedido #{{ pedido.pk }}</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+
+            {# 🚨 MOSTRAR ERRORES GLOBALES DEL FORMULARIO PRINCIPAL #}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                Por favor, corrige los errores en la información general del pedido.
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">Cabecera del Pedido</div>
+                <div class="card-body">
+                    {{ form.as_p }}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">Artículos del Pedido</div>
+                <div class="card-body">
+
+                    {# 🚨 MOSTRAR ERRORES GLOBALES DEL FORMSET (Artículos) #}
+                    {% if articulos_formset.errors %}
+                    <div class="alert alert-danger">
+                        Hay errores en los artículos. Revise si hay filas vacías o datos incorrectos.
+                        {{ articulos_formset.non_form_errors }}
+                    </div>
+                    {% endif %}
+
+                    {{ articulos_formset.management_form }}
+                    
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Producto Comprado</th>
+                                <th>Cantidad Comprada</th>
+                                <th>Precio de Venta</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {# Renderiza los artículos existentes y la fila extra #}
+                            {% for form_articulo in articulos_formset %}
+                            <tr>
+                                {# 🚨 COMIENZO DE LA RENDERIZACIÓN EXPLICITA DE CAMPOS #}
+                                
+                                {# Columna 1: id_producto #}
+                                <td>
+                                    {{ form_articulo.id_producto }}
+                                    <small class="text-danger">{{ form_articulo.id_producto.errors }}</small>
+                                </td>
+
+                                {# Columna 2: cantidad #}
+                                <td>
+                                    {{ form_articulo.cantidad }}
+                                    <small class="text-danger">{{ form_articulo.cantidad.errors }}</small>
+                                </td>
+
+                                {# Columna 3: precio_unitario #}
+                                <td>
+                                    {{ form_articulo.precio_unitario }}
+                                    <small class="text-danger">{{ form_articulo.precio_unitario.errors }}</small>
+                                </td>
+                                
+                                {# Columna 4: Control de Eliminación #}
+                                <td>
+                                    {# Si es un artículo existente, muestra el checkbox de DELETE #}
+                                    {% if form_articulo.instance.pk %}
+                                        <label>
+                                            {{ form_articulo.DELETE }} Eliminar
+                                        </label>
+                                    {% else %}
+                                        {# Si es una fila extra vacía (no guardada), no la marques como eliminable #}
+                                        &nbsp; 
+                                    {% endif %}
+                                    {# Renderiza los campos ocultos del formulario, incluyendo el ID #}
+                                    {% for hidden in form_articulo.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+            <a href="{% url 'pedidos:pedido_list' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+
+        </form>
+    </div>
+{% endblock %}

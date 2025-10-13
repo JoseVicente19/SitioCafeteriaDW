@@ -1,0 +1,246 @@
+{% extends 'baseusuarios.html' %} 
+
+{% load widget_tweaks %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Pedido #{{ form.instance.pk }}
+    {% else %}
+        Crear Nuevo Pedido
+    {% endif %}
+{% endblock %}
+
+{% block contenido %}
+    <h1>
+        {% if form.instance.pk %}
+            Editar Pedido #{{ form.instance.pk }}
+        {% else %}
+            Crear Nuevo Pedido
+        {% endif %}
+    </h1>
+    
+    <form method="post" id="pedido-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                <strong>Error en la Cabecera:</strong>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <h3 class="mt-4 mb-3">Detalles de la Cabecera</h3>
+        <div class="row g-3 p-3 mb-4 border rounded bg-light">
+            {% for field in form %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text text-muted">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <h3 class="mt-4">Artículos del Pedido</h3>
+        
+        {% if articulos_formset.non_field_errors %}
+            <div class="alert alert-warning">{{ articulos_formset.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle" id="articulos-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="formset-container">
+                    {{ articulos_formset.management_form }} 
+
+                    {% for form_detalle in articulos_formset %}
+                        <tr class="{% if form_detalle.errors %}table-danger{% endif %} dynamic-form-row">
+                            
+                            <td>
+                                <div class="form-group">
+                                    {{ form_detalle.id_producto|attr:'class:producto-select form-control' }}
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <div class="form-group">
+                                    {{ form_detalle.cantidad }}
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <div class="form-group">
+                                    {{ form_detalle.precio_unitario|attr:'class:precio-input form-control'|attr:'readonly:true' }}
+                                </div>
+                            </td>
+                            
+                            {% for field in form_detalle.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+
+                            <td class="text-center">
+                                {% if form.instance.pk %}
+                                    {{ form_detalle.DELETE }} 
+                                    {% if form_detalle.instance.pk %}<label for="{{ form_detalle.DELETE.id_for_label }}">Eliminar</label>{% endif %}
+                                {% else %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-form-row">Quitar</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    {% with form_detalle=articulos_formset.empty_form %}
+                    <tr id="empty-form-template" style="display: none;" class="dynamic-form-row">
+                        
+                        <td>
+                            <div class="form-group">
+                                {{ form_detalle.id_producto|attr:'class:producto-select form-control' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">{{ form_detalle.cantidad }}</div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                {{ form_detalle.precio_unitario|attr:'class:precio-input form-control'|attr:'readonly:true' }}
+                            </div>
+                        </td>
+                        {% for field in form_detalle.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-form-row">Quitar</button>
+                        </td>
+                    </tr>
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" class="btn btn-success mt-3" id="add-item-btn">
+            ➕ Agregar Nuevo Artículo
+        </button>
+        
+        <div class="mt-4 pt-3 border-top">
+            <button type="submit" class="btn btn-success me-2">
+                {% if form.instance.pk %}
+                    Guardar Cambios
+                {% else %}
+                    Crear Pedido
+                {% endif %}
+            </button>
+            <a href="{% url 'pedidos:pedido_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+
+    <script>
+        $(document).ready(function() {
+            var $container = $('#formset-container');
+            var $totalForms = $('#id_{{ articulos_formset.prefix }}-TOTAL_FORMS');
+            var $template = $('#empty-form-template');
+            var prefix = '{{ articulos_formset.prefix }}';
+
+            function updateFormIndices() {
+                var currentForms = $container.find('.dynamic-form-row:not(#empty-form-template)');
+                currentForms.each(function(index) {
+                    var $row = $(this);
+                    $row.find(':input, label').each(function() {
+                        var name = $(this).attr('name');
+                        var id = $(this).attr('id');
+                        var htmlFor = $(this).attr('for');
+
+                        if (name) {
+                            name = name.replace(new RegExp('^' + prefix + '-(\\d+)-'), prefix + '-' + index + '-');
+                            $(this).attr('name', name);
+                        }
+                        if (id) {
+                            id = id.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
+                            $(this).attr('id', id);
+                        }
+                        if (htmlFor) {
+                            htmlFor = htmlFor.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
+                            $(this).attr('for', htmlFor);
+                        }
+                    });
+                });
+                $totalForms.val(currentForms.length);
+            }
+
+            // Lógica para AÑADIR FILA 
+            $('#add-item-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                var newIndex = parseInt($totalForms.val());
+                var newFormRow = $template.clone(true);
+                
+                var html = newFormRow.html().replace(/__prefix__/g, newIndex);
+                newFormRow.html(html);
+
+                newFormRow.removeAttr('id').removeAttr('style');
+                $template.before(newFormRow);
+                
+                $totalForms.val(newIndex + 1);
+
+                newFormRow.find('select, input').first().focus();
+            });
+
+            //ELIMINAR FILA ---
+            $container.on('click', '.remove-form-row', function(e) {
+                e.preventDefault();
+                
+                var $row = $(this).closest('.dynamic-form-row');
+                var $deleteCheckbox = $row.find('input[id$="-DELETE"]');
+                
+                if ($deleteCheckbox.length) {
+                    $deleteCheckbox.prop('checked', true);
+                    $row.hide(); 
+                } else {
+                    $row.remove();
+                }
+                updateFormIndices();
+            });
+            
+            // --- Lógica AJAX
+            $container.on('change', '.producto-select', function() {
+                var $select = $(this);
+                var productoId = $select.val(); 
+                
+                var $row = $select.closest('.dynamic-form-row');
+                var $precioInput = $row.find('.precio-input');
+
+                if (productoId) {
+                    $.ajax({
+                        url: "{% url 'pedidos:obtener_precio_producto' %}", 
+                        data: {
+                            'producto_id': productoId 
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            $precioInput.val(data.precio);
+                        },
+                        error: function() {
+                            $precioInput.val('0.00');
+                        }
+                    });
+                } else {
+                    $precioInput.val('0.00');
+                }
+            });
+            updateFormIndices();
+        });
+    </script>
+    {% endblock %}

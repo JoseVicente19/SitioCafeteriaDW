@@ -1,0 +1,86 @@
+{% extends 'baseusuarios.html' %} 
+{% load static %}
+
+{% block title %}
+    Detalles del Pedido #{{ pedido.pk }}
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Detalles del Pedido #{{ pedido.pk }}</h1>
+            <a href="{% url 'pedidos:pedido_list' %}" class="btn btn-secondary">
+                ← Volver al Listado
+            </a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Información General
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Usuario:</strong> {{ pedido.id_usuario.nombre_u|default:"N/A" }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Monto Total:</strong> ${{ pedido.total|floatformat:2 }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Estado:</strong> {{ pedido.get_estado_pedido_display|default:"Sin Estado" }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Dirección de Entrega:</strong> 
+                        {% with direccion=pedido.id_direccion %}
+                            {% if direccion %}
+                                {{ direccion.calle }} #{{ direccion.numero }}, {{ direccion.municipio }}, {{ direccion.departamento }}
+                                {% if direccion.referencia %} (Ref: {{ direccion.referencia }}){% endif %}
+                            {% else %}
+                                Dirección no especificada
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fecha de Creación:</strong> {{ pedido.fecha_pedido|date:"d M, Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mt-5 mb-3">Artículos del Pedido ({{ articulos_pedido|length }})</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for articulo in articulos_pedido %}
+                        <tr>
+                            <td>{{ articulo.id_producto.nombre }}</td> 
+                            <td>{{ articulo.cantidad }}</td>
+                            <td>${{ articulo.precio_unitario|floatformat:2 }}</td>
+                            <td>${{ articulo.get_subtotal|floatformat:2 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">Este pedido no tiene artículos asociados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-end mt-4">
+            <h3>Total: ${{ pedido.total|floatformat:2 }}</h3>
+        </div>
+
+    </div>
+{% endblock %}

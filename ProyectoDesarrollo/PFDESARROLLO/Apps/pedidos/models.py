@@ -60,6 +60,15 @@ class Direccion(models.Model):
 
 
 class Pedido(models.Model):
+    ESTADO_OPCIONES = (
+        ('CARRITO', 'Carrito de Compras Activo'),
+        ('PENDIENTE', 'Pendiente de Pago'),
+        ('PROCESO', 'En Proceso'),
+        ('ENVIADO', 'Enviado'),
+        ('COMPLETADO', 'Completado'),
+        ('CANCELADO', 'Cancelado'),
+    )
+
     id_usuario = models.ForeignKey(
         Usuario,
         on_delete=models.CASCADE,
@@ -76,20 +85,22 @@ class Pedido(models.Model):
         db_column='id_direccion'
     )
     
-    fecha_pedido = models.DateField(
+    fecha_pedido = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Fecha de Pedido'
+        verbose_name='Fecha y Hora de Pedido'
     )
     
     total = models.DecimalField(
         max_digits=10, 
         decimal_places=2,
+        default=0.00, 
         verbose_name='Monto Total del Pedido'
     )
     
     estado_pedido = models.CharField(
         max_length=50,
-        default='PENDIENTE',
+        choices=ESTADO_OPCIONES, 
+        default='CARRITO', 
         verbose_name='Estado del Pedido'
     )
     
@@ -104,12 +115,26 @@ class Pedido(models.Model):
     )
 
     def __str__(self):
-        return f"Pedido #{self.id} de {self.id_usuario.nombre_u}"
+        return f"Pedido #{self.id} de {self.id_usuario.nombre_u} - Estado: {self.get_estado_pedido_display()}"
+
+    def recalcular_total(self):
+        """
+        Método para recalcular el total del pedido a partir de sus artículos.
+        Debe ser llamado tras modificar cualquier ArticuloPedido.
+        """
+        # Suma la multiplicación de cantidad por precio_unitario para todos los artículos
+        total_articulos = self.articulopedido_set.aggregate(
+            subtotal=Sum(F('cantidad') * F('precio_unitario'), output_field=models.DecimalField())
+        )['subtotal'] or 0.00
+        
+        self.total = total_articulos
+        self.save()
 
     class Meta:
         db_table = 'pedido'
         verbose_name = 'Pedido'
         verbose_name_plural = 'Pedidos'
+        ordering = ['-fecha_pedido']
 
 
 class ArticuloPedido(models.Model):
@@ -147,6 +172,11 @@ class ArticuloPedido(models.Model):
         verbose_name='Estado'
     )
 
+
+    def get_subtotal(self):
+        """Calcula y devuelve el subtotal de este artículo."""
+        return self.cantidad * self.precio_unitario
+        
     def __str__(self):
         return f"{self.cantidad} de {self.id_producto.nombre} en Pedido #{self.id_pedido.id}"
 

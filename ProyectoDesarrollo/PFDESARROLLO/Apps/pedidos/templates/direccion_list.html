@@ -1,0 +1,50 @@
+{% extends 'baseusuarios.html' %} 
+
+{% block title %}Lista de Direcciones{% endblock %}
+
+{% block contenido %}
+    <h1>Listado de Direcciones</h1>
+    
+    <a href="{% url 'pedidos:creardirecciones' %}" class="btn btn-primary mb-3">
+        Agregar Nueva Dirección
+    </a>
+
+    {% if direcciones_list %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Calle y Número</th>
+                    <th>Municipio</th>
+                    <th>Departamento</th>
+                    <th>C.P.</th>
+                    <th>Fecha de Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for direccion in direcciones_list %}
+                <tr>
+                    <td>{{ direccion.pk }}</td>
+                    <td>{{ direccion.id_usuario }}</td>
+                    <td>{{ direccion.calle }} #{{ direccion.numero }}</td>
+                    <td>{{ direccion.municipio }}</td>
+                    <td>{{ direccion.departamento }}</td>
+                    <td>{{ direccion.codigo_postal|default:"N/A" }}</td>
+                    <td>{{ direccion.creacion|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'pedidos:editardirecciones' pk=direccion.pk %}" class="btn btn-sm btn-warning">Editar</a> 
+                        <a  class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No se encontraron direcciones registradas.
+        </div>
+    {% endif %}
+
+{% endblock %}
