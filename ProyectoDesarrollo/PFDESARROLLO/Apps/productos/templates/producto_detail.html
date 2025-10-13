@@ -1,0 +1,47 @@
+{% extends 'baseusuarios.html' %} 
+
+{% block title %}Detalle de Producto: {{ producto.nombre }}{% endblock %}
+
+{% block contenido %}
+    <div class="container my-5">
+        <h1>Detalle de Producto: {{ producto.nombre }}</h1>
+        <hr>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Información del Producto
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ producto.pk }}</p>
+                <p><strong>Descripción:</strong> {{ producto.descripcion|default:"N/A" }}</p>
+                <p><strong>Categoría:</strong> {{ producto.id_categoria.nombre|default:"Sin Categoría" }}</p>
+                <p><strong>Precio:</strong> ${{ producto.precio|floatformat:2 }}</p>
+                <p><strong>Stock:</strong> {{ producto.stock }} unidades</p>
+                <p>
+                    <strong>Estado:</strong> 
+                    {% if producto.estado == 1 %}
+                        <span class="badge bg-success">ACTIVO</span>
+                    {% else %}
+                        <span class="badge bg-danger">INACTIVO</span>
+                    {% endif %}
+                </p>
+                <p><strong>Creado el:</strong> {{ producto.creacion|date:"d/m/Y H:i" }}</p>
+                
+                {% if producto.imagen %}
+                    <p><strong>Imagen:</strong></p>
+                    {# Ajusta la ruta si la imagen se sirve estáticamente #}
+                    <img src="{{ producto.imagen.url }}" alt="Imagen de {{ producto.nombre }}" style="max-width: 200px; height: auto;" class="img-thumbnail">
+                {% else %}
+                    <p><strong>Imagen:</strong> No disponible</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'productos:listaproductos' %}" class="btn btn-secondary me-2">
+            Volver al Listado
+        </a>
+        <a href="{% url 'productos:editarproducto' pk=producto.pk %}" class="btn btn-warning">
+            Editar Producto
+        </a>
+    </div>
+{% endblock contenido %}

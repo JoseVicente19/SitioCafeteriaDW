@@ -33,8 +33,13 @@
                     {% endif %}
                 </td>
                 <td>
+                    <a href="{% url 'productos:producto_detail' pk=producto.pk %}" class="btn btn-info btn-sm text-white">DETALLE</a>
                     <a href="{% url 'productos:editarproducto' pk=producto.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
-                    <button class="btn btn-danger btn-sm" disabled>ELIMINAR</button>
+                    <a href="{% url 'productos:producto_eliminar' pk=producto.pk %}" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Está seguro de que desea desactivar el producto {{ producto.nombre }}?');">
+                        ELIMINAR
+                    </a>
                 </td>
             </tr>
             {% endfor %}

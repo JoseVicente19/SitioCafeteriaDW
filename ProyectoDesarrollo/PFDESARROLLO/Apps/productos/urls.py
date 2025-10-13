@@ -16,18 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import ProductoListView, ProductoCreateView, ProductoUpdateView
-from .views import CategoriaListView, CategoriaCreateView, CategoriaUpdateView
+from .views import ProductoListView, ProductoCreateView, ProductoUpdateView, producto_eliminar, ProductoDetailView
+from .views import CategoriaListView, CategoriaCreateView, CategoriaUpdateView, categoria_eliminar
 
 app_name='productos'
 urlpatterns = [
 #URLS PRODUCTOS
     path('', ProductoListView.as_view(), name='listaproductos'),
-    path('/crear', ProductoCreateView.as_view(), name='crearproductos'),
-    path('editar/<int:pk>', ProductoUpdateView.as_view(), name='editarproducto'), 
+    path('crear', ProductoCreateView.as_view(), name='crearproductos'),
+    path('editar/<int:pk>', ProductoUpdateView.as_view(), name='editarproducto'),
+    path('<int:pk>/eliminar/', producto_eliminar, name='producto_eliminar'),
+    path('<int:pk>/', ProductoDetailView.as_view(), name='producto_detail'),
 
     #URLS PARA CATEGORIA
     path('categoria/', CategoriaListView.as_view(), name='listacategoria'),
     path('categoria/crear/', CategoriaCreateView.as_view(), name='crearcategoria'),
     path('categoria/editar/ <int:pk>', CategoriaUpdateView.as_view(), name='editarcategoria'),
+    path('categoria/<int:pk>/eliminar/', categoria_eliminar, name='categoria_eliminar'),
 ]

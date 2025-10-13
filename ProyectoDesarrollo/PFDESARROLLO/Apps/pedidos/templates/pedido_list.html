@@ -65,6 +65,11 @@
                             <a href="{% url 'pedidos:pedido_detail' pk=pedido.pk %}" class="btn btn-sm btn-info">Detalles</a>
                             
                             <a href="{% url 'pedidos:pedido_update' pk=pedido.pk %}" class="btn btn-sm btn-warning">Editar</a>
+
+                            <a href="{% url 'pedidos:pedido_eliminar' pk=pedido.pk %}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('¿Está seguro de que desea eliminar (desactivar) el pedido #{{ pedido.pk }}?');">
+                                Eliminar
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

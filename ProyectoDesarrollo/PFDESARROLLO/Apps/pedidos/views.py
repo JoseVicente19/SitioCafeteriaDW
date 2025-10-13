@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from decimal import Decimal
+from django.urls import reverse 
 
 class DireccionListView(ListView):
     model = Direccion
@@ -140,22 +141,18 @@ class PedidoUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        
-        # En el caso de GET, inicializa el formset con los datos existentes
+
         if not self.request.POST:
             data['articulos_formset'] = ArticuloPedidoFormset(instance=self.object)
-        
-        # Si ya se inicializó en POST (ver def post), simplemente se devuelve
+
         return data
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         
         form = self.get_form()
-        # Inicializamos el formset en el POST
         articulos_formset = ArticuloPedidoFormset(request.POST, instance=self.object)
         
-        # 🚨 Agregamos el formset al contexto en el caso de POST para que esté disponible en form_valid/invalid
         self.articulos_formset = articulos_formset 
         
         if form.is_valid() and articulos_formset.is_valid():
@@ -164,30 +161,22 @@ class PedidoUpdateView(UpdateView):
             return self.form_invalid(form, articulos_formset)
 
     def form_valid(self, form, articulos_formset):
-        # 🚨 PASO CRUCIAL: RECALCULAR EL TOTAL ANTES DE GUARDAR
         total_calculado = Decimal('0.00')
-        
-        # Recorre todos los formularios válidos en el formset
-        # Nota: Debes usar formset.cleaned_data para asegurarte de que los datos son válidos
+
         for articulo_data in articulos_formset.cleaned_data:
-            # Si el formulario existe y NO está marcado para eliminación
             if articulo_data and not articulo_data.get('DELETE', False):
                 cantidad = articulo_data.get('cantidad') or 0
                 precio = articulo_data.get('precio_unitario') or 0
                 
-                # Asegúrate de que los tipos son correctos para la multiplicación
                 if isinstance(cantidad, int) and isinstance(precio, Decimal):
                     total_calculado += cantidad * precio
                 
-        # 🚨 Asigna el total calculado a la instancia del pedido (self.object)
         form.instance.total = total_calculado 
         
         try:
             with transaction.atomic():
-                # Guarda la cabecera (Pedido)
                 self.object = form.save()
                 
-                # Guarda los detalles (ArticuloPedido)
                 articulos_formset.instance = self.object
                 articulos_formset.save()
             
@@ -196,10 +185,18 @@ class PedidoUpdateView(UpdateView):
             
         except Exception as e:
             messages.error(self.request, f"❌ Hubo un error al guardar el pedido: {e}")
-            # Si el error ocurre aquí (ej. DB error), se redirige a form_invalid
             return self.form_invalid(form, articulos_formset)
 
     def form_invalid(self, form, articulos_formset):
-        # Pasa el formset inicializado (con errores) al contexto
         context = self.get_context_data(form=form, articulos_formset=articulos_formset)
         return self.render_to_response(context)
+
+def pedido_eliminar(request, pk):
+
+    pedido = get_object_or_404(Pedido, pk=pk)
+    
+    # Solo cambiamos el estado
+    pedido.estado = 0
+    pedido.save()
+
+    return redirect(reverse('pedidos:pedido_list')) 

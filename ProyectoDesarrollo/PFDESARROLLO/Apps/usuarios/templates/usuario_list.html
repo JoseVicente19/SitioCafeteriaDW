@@ -1,10 +1,10 @@
-{% extends 'baseusuarios.html' %} 
+{% extends 'baseusuarios.html' %}
 
 {% block contenido %}
 <div class="container my-5">
-    
+
     <h2>LISTADO DE USUARIOS</h2>
-    
+
     {% if usuarios_list %}
     <table class="table table-striped" border="1">
         <thead>
@@ -17,28 +17,32 @@
             </tr>
         </thead>
         <tbody>
-            
+
             {% for usuario in usuarios_list %}
             <tr>
-                <td>{{ usuario.nombre_p }}</td> 
+                <td>{{ usuario.nombre_p }}</td>
                 <td>{{ usuario.correo }}</td>
                 <td>
                     {% if usuario.estado == 1 %}
-                        <span class="badge bg-success">Activo</span>
+                    <span class="badge bg-success">Activo</span>
                     {% else %}
-                        <span class="badge bg-danger">Inactivo</span>
+                    <span class="badge bg-danger">Inactivo</span>
                     {% endif %}
                 </td>
                 <td>
                     {% for usuario_rol in usuario.usuariorole_set.all %}
-                        <span class="badge bg-info text-dark">{{ usuario_rol.id_rol }}</span>
+                    <span class="badge bg-info text-dark">{{ usuario_rol.id_rol }}</span>
                     {% empty %}
-                        <span class="badge bg-secondary">Sin Rol</span>
+                    <span class="badge bg-secondary">Sin Rol</span>
                     {% endfor %}
                 </td>
                 <td>
+                    <a href="{% url 'usuarios:usuario_detail' pk=usuario.pk %}" class="btn btn-info btn-sm text-white">DETALLE</a>
                     <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
-                    <a href="#" class="btn btn-danger btn-sm">ELIMINAR</a>
+                    <a href="{% url 'usuarios:usuario_eliminar' pk=usuario.pk %}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('¿Desea desactivar a {{ usuario.nombre_p }}?');">
+                        ELIMINAR
+                    </a>
                 </td>
             </tr>
             {% endfor %}

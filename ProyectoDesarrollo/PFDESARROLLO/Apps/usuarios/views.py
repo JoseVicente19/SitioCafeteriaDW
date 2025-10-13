@@ -1,20 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
-
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
 from .models import Role, Usuario, UsuarioRole
 from .forms import UsuarioForm, RoleForm
 from django import forms 
-
 
 #VISTAS DE USUARIOS
 class UsuarioListView(ListView):
     model = Usuario
     template_name = 'usuario_list.html'
-    context_object_name = 'usuarios_list'
+    context_object_name = 'usuarios_list'   
+    def get_queryset(self):
+        return Usuario.objects.filter(estado=1).order_by('nombre_p')
 
 class UsuarioCreateView(CreateView):
     model = Usuario
@@ -91,22 +90,45 @@ class UsuarioUpdateView(UpdateView):
         
         return response
 
+def usuario_eliminar(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+
+    usuario.estado = 0
+    usuario.save()
+    return redirect('usuarios:listausuarios')
+
+
+class UsuarioDetailView(DetailView):
+    model = Usuario
+    template_name = 'usuario_detail.html'
+    context_object_name = 'usuario' 
+
 
 #VISTAS DE ROLES
 class RoleListView(ListView):
     model = Role
-    template_name = 'role_list.html' # Crearemos este template
+    template_name = 'role_list.html' 
     context_object_name = 'roles_list'
+    
+    def get_queryset(self):
+        return Role.objects.filter(estado=1).order_by('descripcion') 
+
+
 
 class RoleCreateView(CreateView):
     model = Role
     form_class = RoleForm
-    template_name = 'crearform.html' # Usaremos el mismo form para crear y editar
+    template_name = 'crearform.html' 
     success_url = reverse_lazy('usuarios:listaroles') 
-
 
 class RoleUpdateView(UpdateView):
     model = Role
     form_class = RoleForm
     template_name = 'editarform.html'
     success_url = reverse_lazy('usuarios:listaroles')
+
+def rol_eliminar(request, pk):
+    rol = get_object_or_404(Role, pk=pk)
+    rol.estado = 0
+    rol.save()
+    return redirect('usuarios:listaroles') 

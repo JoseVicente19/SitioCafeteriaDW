@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import DireccionListView, DireccionCreateView, DireccionUpdateView
-from .views import PedidoListView, PedidoCreateView, obtener_precio_producto, PedidoDetailView, PedidoUpdateView
+from .views import PedidoListView, PedidoCreateView, obtener_precio_producto, PedidoDetailView, PedidoUpdateView, pedido_eliminar
 
 
 app_name='pedidos'
@@ -36,5 +36,6 @@ urlpatterns = [
     path('ajax/obtener_precio/', obtener_precio_producto, name='obtener_precio_producto'),
     path('<int:pk>/', PedidoDetailView.as_view(), name='pedido_detail'),
     path('<int:pk>/editar/', PedidoUpdateView.as_view(), name='pedido_update'),
+    path('<int:pk>/eliminar/', pedido_eliminar, name='pedido_eliminar'), 
 
 ]

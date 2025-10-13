@@ -16,18 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import UsuarioListView , UsuarioCreateView, UsuarioUpdateView
-from .views import RoleListView , RoleCreateView, RoleUpdateView
+from .views import UsuarioListView , UsuarioCreateView, UsuarioUpdateView, usuario_eliminar, UsuarioDetailView
+from .views import RoleListView , RoleCreateView, RoleUpdateView, rol_eliminar
 
 app_name='usuarios'
 urlpatterns = [
     path('', UsuarioListView.as_view(), name='listausuarios'),
     path('crear/', UsuarioCreateView.as_view(), name='crearusuario'),
     path('editar/ <int:pk>', UsuarioUpdateView.as_view(), name='editarusuario'),
+    path('<int:pk>/eliminar/', usuario_eliminar, name='usuario_eliminar'),
+    path('<int:pk>/', UsuarioDetailView.as_view(), name='usuario_detail'),
 
     #PATHS PARA ROLES
     path('roles/', RoleListView.as_view(), name='listaroles'),
     path('roles/crear/', RoleCreateView.as_view(), name='crearrol'),
     path('roles/editar/<int:pk>/', RoleUpdateView.as_view(), name='editarrol'),
+    path('roles/<int:pk>/eliminar/', rol_eliminar, name='rol_eliminar'),
 
 ]

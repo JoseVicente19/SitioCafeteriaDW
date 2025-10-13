@@ -31,7 +31,11 @@
                 <td>{{ categoria.creacion|date:"Y-m-d" }}</td>
                 <td>
                     <a href="{% url 'productos:editarcategoria' pk=categoria.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
-                    <button class="btn btn-danger btn-sm" disabled>ELIMINAR</button>
+                    <a href="{% url 'productos:categoria_eliminar' pk=categoria.pk %}" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Está seguro de que desea desactivar la categoría {{ categoria.nombre }}?');">
+                        ELIMINAR
+                    </a>
                 </td>
             </tr>
             {% endfor %}

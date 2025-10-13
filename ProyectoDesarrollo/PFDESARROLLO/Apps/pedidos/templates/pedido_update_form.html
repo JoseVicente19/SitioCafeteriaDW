@@ -1,103 +1,238 @@
 {% extends 'baseusuarios.html' %} 
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Editar Pedido #{{ pedido.pk }}{% endblock %}
 
 {% block contenido %}
-    <div class="container mt-4">
-        <h1>Editar Pedido #{{ pedido.pk }}</h1>
-        
-        <form method="post">
-            {% csrf_token %}
+    <div class="container mt-4">
+        <h1>Editar Pedido #{{ pedido.pk }}</h1>
+        
+        <form method="post" id="pedido-form"> 
+            {% csrf_token %}
 
-            {# 🚨 MOSTRAR ERRORES GLOBALES DEL FORMULARIO PRINCIPAL #}
-            {% if form.errors %}
-            <div class="alert alert-danger">
-                Por favor, corrige los errores en la información general del pedido.
-                {{ form.non_field_errors }}
-            </div>
-            {% endif %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                Por favor, corrige los errores en la información general del pedido.
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
 
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">Cabecera del Pedido</div>
-                <div class="card-body">
-                    {{ form.as_p }}
-                </div>
-            </div>
+            <div class="card mb-4">
+                <div class="card-header bg-info text-dark">Cabecera del Pedido</div>
+                <div class="card-body">
+                    {{ form.as_p }} 
+                </div>
+            </div>
 
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">Artículos del Pedido</div>
-                <div class="card-body">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-dark">Artículos del Pedido</div>
+                <div class="card-body">
 
-                    {# 🚨 MOSTRAR ERRORES GLOBALES DEL FORMSET (Artículos) #}
-                    {% if articulos_formset.errors %}
-                    <div class="alert alert-danger">
-                        Hay errores en los artículos. Revise si hay filas vacías o datos incorrectos.
-                        {{ articulos_formset.non_form_errors }}
-                    </div>
-                    {% endif %}
+                    {% if articulos_formset.errors %}
+                    <div class="alert alert-danger">
+                        Hay errores en los artículos. Revise si hay filas vacías o datos incorrectos.
+                        {{ articulos_formset.non_form_errors }}
+                    </div>
+                    {% endif %}
 
-                    {{ articulos_formset.management_form }}
-                    
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Producto Comprado</th>
-                                <th>Cantidad Comprada</th>
-                                <th>Precio de Venta</th>
-                                <th>Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {# Renderiza los artículos existentes y la fila extra #}
-                            {% for form_articulo in articulos_formset %}
-                            <tr>
-                                {# 🚨 COMIENZO DE LA RENDERIZACIÓN EXPLICITA DE CAMPOS #}
-                                
-                                {# Columna 1: id_producto #}
-                                <td>
-                                    {{ form_articulo.id_producto }}
-                                    <small class="text-danger">{{ form_articulo.id_producto.errors }}</small>
-                                </td>
+                    {{ articulos_formset.management_form }}
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="articulos-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto Comprado</th>
+                                    <th style="width: 15%;">Cantidad Comprada</th>
+                                    <th style="width: 20%;">Precio de Venta</th>
+                                    <th style="width: 5%;" class="text-center">Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                {% for form_articulo in articulos_formset %}
+                                <tr class="align-middle dynamic-form-row {% if form_articulo.errors %}table-danger{% endif %}">
+                                    
+                                    <td>
+                                        <div style="min-width: 150px;">
+                                            {# Aseguramos la clase 'producto-select' #}
+                                            {{ form_articulo.id_producto|attr:'class:producto-select form-control' }} 
+                                        </div>
+                                        <small class="text-danger">{{ form_articulo.id_producto.errors }}</small>
+                                    </td>
 
-                                {# Columna 2: cantidad #}
-                                <td>
-                                    {{ form_articulo.cantidad }}
-                                    <small class="text-danger">{{ form_articulo.cantidad.errors }}</small>
-                                </td>
+                                    <td style="width: 15%;">
+                                        <div style="max-width: 80px; margin-right: 15px;"> 
+                                            {{ form_articulo.cantidad|attr:'class:form-control text-end' }}
+                                        </div>
+                                        <small class="text-danger">{{ form_articulo.cantidad.errors }}</small>
+                                    </td>
 
-                                {# Columna 3: precio_unitario #}
-                                <td>
-                                    {{ form_articulo.precio_unitario }}
-                                    <small class="text-danger">{{ form_articulo.precio_unitario.errors }}</small>
-                                </td>
-                                
-                                {# Columna 4: Control de Eliminación #}
-                                <td>
-                                    {# Si es un artículo existente, muestra el checkbox de DELETE #}
-                                    {% if form_articulo.instance.pk %}
-                                        <label>
-                                            {{ form_articulo.DELETE }} Eliminar
-                                        </label>
-                                    {% else %}
-                                        {# Si es una fila extra vacía (no guardada), no la marques como eliminable #}
-                                        &nbsp; 
-                                    {% endif %}
-                                    {# Renderiza los campos ocultos del formulario, incluyendo el ID #}
-                                    {% for hidden in form_articulo.hidden_fields %}
-                                        {{ hidden }}
-                                    {% endfor %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    <td style="width: 20%;">
+                                        <div style="max-width: 100px;">
+                                            {# Aseguramos la clase 'precio-input' y 'readonly' #}
+                                            {{ form_articulo.precio_unitario|attr:'class:precio-input form-control text-end'|attr:'readonly:true' }} 
+                                        </div>
+                                        <small class="text-danger">{{ form_articulo.precio_unitario.errors }}</small>
+                                    </td>
+                                    
+                                    <td class="text-center align-middle">
+                                        {# Checkbox de DELETE para filas existentes #}
+                                        <label>
+                                            {{ form_articulo.DELETE }}
+                                        </label>
+                                        
+                                        {% for hidden in form_articulo.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
 
-            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
-            <a href="{% url 'pedidos:pedido_list' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                                {# ---------------------------------------------------------------- #}
+                                {# AÑADIMOS EL TEMPLATE OCULTO PARA NUEVOS PRODUCTOS #}
+                                {% with form_articulo=articulos_formset.empty_form %}
+                                <tr id="empty-form-template" style="display: none;" class="align-middle dynamic-form-row">
+                                    <td>
+                                        <div style="min-width: 150px;">
+                                            {# Añadir clase para AJAX y estilo form-control #}
+                                            {{ form_articulo.id_producto|attr:'class:producto-select form-control' }} 
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 80px; margin-right: 15px;"> 
+                                            {# Añadir estilo form-control #}
+                                            {{ form_articulo.cantidad|attr:'class:form-control text-end' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 100px;">
+                                            {# CLAVE: Añadir clase 'precio-input' y atributo 'readonly' #}
+                                            {{ form_articulo.precio_unitario|attr:'class:precio-input form-control text-end'|attr:'readonly:true' }}
+                                        </div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-form-row">Quitar</button>
+                                        {% for hidden in form_articulo.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                                {# ---------------------------------------------------------------- #}
 
-        </form>
-    </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-success mb-4" id="add-item-btn">
+                 ➕ Agregar Nuevo Producto
+            </button>
+
+            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+            <a href="{% url 'pedidos:pedido_list' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+
+        </form>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+
+    <script>
+        $(document).ready(function() {
+            var $container = $('#formset-container');
+            var $totalForms = $('#id_{{ articulos_formset.prefix }}-TOTAL_FORMS');
+            var $template = $('#empty-form-template');
+            var prefix = '{{ articulos_formset.prefix }}';
+
+            function updateFormIndices() {
+                var currentForms = $container.find('.dynamic-form-row:not(#empty-form-template):visible');
+                currentForms.each(function(index) {
+                    var $row = $(this);
+                    $row.find(':input, label').each(function() {
+                        var name = $(this).attr('name');
+                        var id = $(this).attr('id');
+                        var htmlFor = $(this).attr('for');
+
+                        if (name) {
+                            name = name.replace(new RegExp('^' + prefix + '-(\\d+)-'), prefix + '-' + index + '-');
+                            $(this).attr('name', name);
+                        }
+                        if (id) {
+                            id = id.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
+                            $(this).attr('id', id);
+                        }
+                        if (htmlFor) {
+                            htmlFor = htmlFor.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
+                            $(this).attr('for', htmlFor);
+                        }
+                    });
+                });
+                $totalForms.val(currentForms.length);
+            }
+
+            // Lógica para AÑADIR FILA
+            $('#add-item-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                var newIndex = parseInt($totalForms.val());
+                var newFormRow = $template.clone(true);
+                
+                var html = newFormRow.html().replace(/__prefix__/g, newIndex);
+                newFormRow.html(html);
+
+                newFormRow.removeAttr('id').removeAttr('style');
+                // Limpiar valores por defecto (es importante para que no se hereden del template)
+                newFormRow.find('input:not([type="hidden"]), select').val('');
+
+                $container.append(newFormRow); 
+
+                $totalForms.val(newIndex + 1);
+
+                newFormRow.find('select, input').first().focus();
+            });
+
+            // Lógica para QUITAR FILA (para las filas nuevas con botón 'Quitar')
+            $container.on('click', '.remove-form-row', function(e) {
+                e.preventDefault();
+                
+                var $row = $(this).closest('.dynamic-form-row');
+                $row.remove();
+                
+                updateFormIndices();
+            });
+
+            // --- Lógica AJAX (Para obtener precio automáticamente) ---
+            $container.on('change', '.producto-select', function() {
+                var $select = $(this);
+                var productoId = $select.val(); 
+                
+                var $row = $select.closest('.dynamic-form-row');
+                // Buscamos el input de precio unitario dentro de la fila
+                var $precioInput = $row.find('.precio-input');
+
+                if (productoId) {
+                    $.ajax({
+                        // Asegúrate de que esta URL esté definida en tu urls.py de Django
+                        url: "{% url 'pedidos:obtener_precio_producto' %}", 
+                        data: {
+                            'producto_id': productoId 
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            // Rellena el campo de precio con el valor de la respuesta AJAX
+                            $precioInput.val(parseFloat(data.precio).toFixed(2));
+                        },
+                        error: function() {
+                            $precioInput.val('0.00');
+                        }
+                    });
+                } else {
+                    $precioInput.val('0.00');
+                }
+            });
+
+            updateFormIndices(); 
+        });
+    </script>
 {% endblock %}

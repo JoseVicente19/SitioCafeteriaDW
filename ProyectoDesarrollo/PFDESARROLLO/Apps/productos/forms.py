@@ -50,10 +50,10 @@ class ProductoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        self.fields['id_categoria'].queryset = Categoria.objects.filter(estado=1).order_by('nombre')
         for name, field in self.fields.items():
             if name != 'estado': 
-                 field.widget.attrs.update({'class': 'form-control'})
-            
+                field.widget.attrs.update({'class': 'form-control'})
         if self.instance.pk:
             self.initial['estado'] = self.instance.estado == 1
             

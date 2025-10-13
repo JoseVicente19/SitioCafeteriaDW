@@ -11,6 +11,7 @@
             <tr>
                 <th>NOMBRE</th>
                 <th>FECHA DE CREACIÓN</th>
+                <th>ESTADO</th> 
                 <th>ACCIONES</th>
             </tr>
         </thead>
@@ -20,17 +21,27 @@
                 <td>{{ rol.descripcion }}</td>
                 <td>{{ rol.creacion|date:"Y-m-d" }}</td>
                 <td>
-                    {# Enlace al formulario de edición #}
+                    {% if rol.estado == 1 %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                    {% endif %}
+                </td>
+                
+                <td>
                     <a href="{% url 'usuarios:editarrol' pk=rol.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
-                    {# La funcionalidad ELIMINAR se implementará después #}
-                    <a href="#" class="btn btn-danger btn-sm">ELIMINAR</a>
+
+                    <a href="{% url 'usuarios:rol_eliminar' pk=rol.pk %}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('¿Está seguro de que desea desactivar el rol {{ rol.descripcion }}?');">
+                        ELIMINAR
+                    </a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <div class="alert alert-info mt-4">No hay roles registrados.</div>
+    <div class="alert alert-info mt-4">No hay roles activos registrados.</div>
     {% endif %}
 
 

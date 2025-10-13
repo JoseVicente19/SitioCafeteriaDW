@@ -1,0 +1,56 @@
+{% extends 'baseusuarios.html' %} 
+
+{% block title %}Detalle de Usuario: {{ usuario.nombre_p }}{% endblock %}
+
+{% block contenido %}
+    <div class="container my-5">
+        <h1>Detalle de Usuario: {{ usuario.nombre_p }}</h1>
+        <hr>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Información General
+            </div>
+            <div class="card-body">
+                <p><strong>ID de Usuario:</strong> {{ usuario.pk }}</p>
+                <p><strong>Nombre Completo:</strong> {{ usuario.nombre_p }}</p>
+                <p><strong>Correo Electrónico:</strong> {{ usuario.correo }}</p>
+                <p><strong>Fecha de Creación:</strong> {{ usuario.creacion|date:"d/m/Y H:i" }}</p>
+                <p>
+                    <strong>Estado:</strong> 
+                    {% if usuario.estado == 1 %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                    {% endif %}
+                </p>
+                
+                {# Si tienes campos adicionales como teléfono o dirección, agrégalos aquí #}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-dark">
+                Roles Asignados
+            </div>
+            <div class="card-body">
+                {% if usuario.usuariorole_set.all %}
+                    <ul class="list-group">
+                        {% for usuario_rol in usuario.usuariorole_set.all %}
+                            <li class="list-group-item">{{ usuario_rol.id_rol }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Este usuario no tiene roles asignados.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'usuarios:listausuarios' %}" class="btn btn-secondary me-2">
+            Volver al Listado
+        </a>
+        <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning">
+            Editar Usuario
+        </a>
+    </div>
+{% endblock contenido %}
