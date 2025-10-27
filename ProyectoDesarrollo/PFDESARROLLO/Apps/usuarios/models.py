@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db.models import functions
-
+from django.contrib.auth.hashers import make_password, check_password
 # Create your models here.
 
 class Role(models.Model):
@@ -28,7 +28,10 @@ class Role(models.Model):
         verbose_name = 'Rol de Usuario'
         verbose_name_plural = 'Roles de Usuario'
 
-class Usuario(models.Model):   
+class Usuario(models.Model): 
+    USERNAME_FIELD = 'nombre_u'
+    REQUIRED_FIELDS = ['correo'] 
+    
     nombre_u = models.CharField(max_length=100, unique=True, verbose_name='Nombre de Usuario')
     correo = models.EmailField(max_length=100, unique=True, verbose_name='Correo Electrónico')
     password = models.CharField(max_length=255, verbose_name='Contraseña') 
@@ -44,6 +47,30 @@ class Usuario(models.Model):
         db_table = 'usuario'
         verbose_name = 'Usuario del Sistema'
         verbose_name_plural = 'Usuarios del Sistema'
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def is_active(self):
+        return self.estado == 1
+    
+    def is_staff(self):
+        return False
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff()
+
 
 class UsuarioRole(models.Model):
     id_usuario = models.ForeignKey(

@@ -1,0 +1,89 @@
+{% load static %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}Iniciar Sesión - PAGINA CAFERTERIA{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/vendor.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <defs>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="link" viewBox="0 0 24 24">...</symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="arrow-right" viewBox="0 0 24 24">...</symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="close" viewBox="0 0 15 15">...</symbol>
+      </defs>
+    </svg>
+
+    <div class="preloader-wrapper">...</div>
+    {# ELIMINADO: offcanvas de carrito y búsqueda #}
+    
+    <header>
+      <div class="container-fluid">
+        <div class="row py-3 border-bottom">
+          
+          {# LOGO: Se mantiene, redirigiendo al home #}
+          <div class="col-sm-4 col-lg-3 text-center text-sm-start">
+            <div class="main-logo">
+              <a href="{% url 'home:homeapp' %}">
+                <img src="{% static 'images/logo.png'%}" alt="logo" class="img-fluid">
+              </a>
+            </div>
+          </div>
+          
+          {# ELIMINADO: Barra de búsqueda y selector de categorías #}
+          <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
+            {# ESTA COLUMNA QUEDA VACÍA O ESCONDIDA #}
+          </div>
+          
+          {# CAJA DE SOPORTE/CONTACTO: Se mantiene solo si es información fija #}
+          <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
+            <div class="support-box text-end d-none d-xl-block">
+              <span class="fs-6 text-muted">Para Soporte?</span>
+              <h5 class="mb-0">+980-34984089</h5>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+      
+      {# AQUÍ SE INYECTARÁ EL CONTENIDO DE LA VISTA DE LOGIN #}
+      {% block contenido%}
+      {% endblock %}
+      
+      {# ELIMINADO: Barra de navegación inferior y menú de departamentos #}
+      
+    </header> 
+    
+    <footer class="py-5">
+      </footer>
+    <div id="footer-bottom">
+      </div>
+    
+    <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>

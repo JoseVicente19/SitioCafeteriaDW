@@ -1,11 +1,12 @@
 from django import forms
 
 class LoginForm(forms.Form):
-    correo = forms.EmailField(
-        label='Correo Electrónico',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa tu correo'})
+    nombre_u = forms.CharField(
+        max_length=100, 
+        label='Nombre de Usuario',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     password = forms.CharField(
         label='Contraseña',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa tu contraseña'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )

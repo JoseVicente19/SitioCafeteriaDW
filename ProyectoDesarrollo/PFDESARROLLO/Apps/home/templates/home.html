@@ -1,4 +1,23 @@
 {% extends 'base.html' %}
+
 {% block contenido%}
 <h1>PAGINA HOME</h1>
-{% endblock %}
+
+{% if user.is_authenticated %}
+    <p>
+        ¡Bienvenido de nuevo, 
+        
+        <strong>{{ user.nombre_p|default:user.nombre_u }}</strong>!
+    </p>
+
+    <div class="mt-4">
+        <form method="post" action="{% url 'home:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Cerrar Sesión</button>
+        </form>
+            </div>
+    
+{% else %}
+    <p>No has iniciado sesión.</p>
+{% endif %}
+{% endblock contenido%}

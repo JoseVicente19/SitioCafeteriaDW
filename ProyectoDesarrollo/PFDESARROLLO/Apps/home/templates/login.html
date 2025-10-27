@@ -1,11 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "baselogin.html" %} 
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block contenido %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h3>Acceso al Sistema</h3>
+                    </div>
+                    <div class="card-body">
+                        
+                        {# Muestra mensajes de éxito/error/info si existen (ej: contraseña incorrecta) #}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                        
+                        {# El formulario POST apunta a la URL de login actual #}
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            {# Campo de Nombre de Usuario (nombre_u) #}
+                            <div class="mb-3">
+                                {{ form.nombre_u.label_tag }}
+                                {{ form.nombre_u }}
+                            </div>
+                            
+                            {# Campo de Contraseña (password) #}
+                            <div class="mb-3">
+                                {{ form.password.label_tag }}
+                                {{ form.password }}
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-success">INICIAR SESIÓN</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock contenido %}
