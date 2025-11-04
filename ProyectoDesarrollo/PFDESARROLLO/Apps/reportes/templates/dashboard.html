@@ -1,0 +1,88 @@
+{% extends "baseusuarios.html" %} 
+{% load static %}
+
+{% block title %}Dashboard de Reportes{% endblock %}
+
+{% block contenido %} 
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">📊 Dashboard de Reportes de Ventas</h1>
+    
+    <div class="d-flex align-items-center mb-4">
+        <form method="post" action="{% url 'reportes:generar_reporte' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-lg">
+                Generar Reporte del Día
+            </button>
+        </form>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <span class="text-{{ message.tags }} ms-3">{{ message }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if fecha_reporte %}
+    <p class="text-muted">Mostrando datos del último reporte: <strong>{{ fecha_reporte }}</strong></p>
+    {% endif %}
+    <hr>
+
+    <div class="row mb-5">
+        
+        <div class="col-lg-6 col-md-12">
+            <div class="card shadow-sm p-4 text-center bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Ventas Totales Diarias</h5>
+                    <p class="display-4">**${{ ventas_dia|floatformat:2 }}**</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12">
+            <div class="card shadow-sm p-4 text-center bg-info text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Número de Pedidos Diarios</h5>
+                    <p class="display-4">**{{ pedidos_dia }}**</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title">📦 Top Producto Más Vendido</h5>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad Vendida</th>
+                                <th>Total Generado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos_tabla %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.cantidad }}</td>
+                                <td>${{ producto.total|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted">No hay datos de productos más vendidos disponibles.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock contenido %} 
+
+{% block custom_js %}{% endblock custom_js %}

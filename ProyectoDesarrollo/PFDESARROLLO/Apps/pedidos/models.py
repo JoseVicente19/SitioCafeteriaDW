@@ -117,11 +117,7 @@ class Pedido(models.Model):
         return f"Pedido #{self.id} de {self.id_usuario.nombre_u} - Estado: {self.get_estado_pedido_display()}"
 
     def recalcular_total(self):
-        """
-        Método para recalcular el total del pedido a partir de sus artículos.
-        Debe ser llamado tras modificar cualquier ArticuloPedido.
-        """
-        # Suma la multiplicación de cantidad por precio_unitario para todos los artículos
+
         total_articulos = self.articulopedido_set.aggregate(
             subtotal=Sum(F('cantidad') * F('precio_unitario'), output_field=models.DecimalField())
         )['subtotal'] or 0.00
@@ -173,7 +169,6 @@ class ArticuloPedido(models.Model):
 
 
     def get_subtotal(self):
-        """Calcula y devuelve el subtotal de este artículo."""
         return self.cantidad * self.precio_unitario
         
     def __str__(self):

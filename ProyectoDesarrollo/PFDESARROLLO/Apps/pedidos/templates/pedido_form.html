@@ -227,13 +227,11 @@
             
             var newIndex = parseInt($totalForms.val());
             var newFormRow = $template.clone(true);
-            
-            // Reemplazar el prefijo en el HTML clonado
             var html = newFormRow.html().replace(/__prefix__/g, newIndex);
             newFormRow.html(html);
 
             newFormRow.removeAttr('id').removeAttr('style');
-            $template.before(newFormRow); // Insertar antes de la plantilla vacía
+            $template.before(newFormRow); 
             
             $totalForms.val(newIndex + 1);
 
@@ -248,11 +246,9 @@
             var $deleteCheckbox = $row.find('input[id$="-DELETE"]');
             
             if ($deleteCheckbox.length) {
-                // Si existe el checkbox (Edición), lo marca y oculta
                 $deleteCheckbox.prop('checked', true);
                 $row.hide(); 
             } else {
-                // Si no existe el checkbox (Creación), simplemente elimina 
                 $row.remove();
             }
             updateFormIndices();

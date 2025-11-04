@@ -25,8 +25,6 @@
             
             <form method="post" id="pedido-form"> 
                 {% csrf_token %}
-
-                {# --- ERRORES NO RELACIONADOS CON CAMPOS --- #}
                 {% if form.non_field_errors %}
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i> Error en la Cabecera</h4>
@@ -34,21 +32,15 @@
                 </div>
                 {% endif %}
                 
-                {# ======================================================= #}
-                {# --- SECCIÓN 1: CABECERA DEL PEDIDO (CAMPOS DEL FORM) --- #}
-                {# ======================================================= #}
                 <h3 class="mt-2 mb-3 pb-2 border-bottom text-primary fw-bold">
                     <i class="fas fa-file-alt me-2"></i> Información General
                 </h3>
                 
                 <div class="row g-4 p-3 mb-5 border rounded-3 bg-light">
-                    {# Iteramos sobre el formulario principal (PedidoForm) #}
                     {% for field in form %}
                         <div class="col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                                
-                                {# Estilización especial para id_usuario, id_direccion, estado_pedido y estado #}
                                 {% if field.name == 'id_usuario' or field.name == 'id_direccion' or field.name == 'estado_pedido' or field.name == 'estado' %}
                                     {% if field.name == 'estado' and not pedido.pk %}
                                         {# Lógica para fijar 'estado' a 'Activo' (asumiendo valor 1) en creación #}
@@ -76,10 +68,6 @@
                     {% endfor %}
                 </div>
                 
-
-                {# ======================================================= #}
-                {# --- SECCIÓN 2: ARTÍCULOS DEL PEDIDO (FORMSET) --- #}
-                {# ======================================================= #}
                 <h3 class="mt-4 mb-3 pb-2 border-bottom text-primary fw-bold">
                     <i class="fas fa-list me-2"></i> Artículos del Pedido
                 </h3>
@@ -147,8 +135,6 @@
                                     </tr>
                                     {% endfor %}
 
-                                    {# ---------------------------------------------------------------- #}
-                                    {# TEMPLATE OCULTO PARA NUEVOS PRODUCTOS #}
                                     {% with form_articulo=articulos_formset.empty_form %}
                                     <tr id="empty-form-template" style="display: none;" class="align-middle dynamic-form-row">
                                         <td>
@@ -177,7 +163,6 @@
                                         </td>
                                     </tr>
                                     {% endwith %}
-                                    {# ---------------------------------------------------------------- #}
 
                                 </tbody>
                             </table>
@@ -214,11 +199,8 @@
         var prefix = '{{ articulos_formset.prefix }}';
 
         function updateFormIndices() {
-            // Buscamos todas las filas visibles (no marcadas para eliminación)
             var currentForms = $container.find('.dynamic-form-row:not(#empty-form-template)').filter(function() {
                 var deleteCheckbox = $(this).find('input[type="checkbox"][id$="-DELETE"]');
-                // Si la fila tiene el checkbox, solo la contamos si NO está marcada.
-                // Si no tiene checkbox (fila nueva), siempre la contamos.
                 return deleteCheckbox.length === 0 || !deleteCheckbox.prop('checked');
             });
             
@@ -230,17 +212,14 @@
                     var htmlFor = $(this).attr('for');
 
                     if (name) {
-                        // Reemplaza el índice en el nombre (e.g., articulos-0-producto)
                         name = name.replace(new RegExp('^' + prefix + '-(\\d+)-'), prefix + '-' + index + '-');
                         $(this).attr('name', name);
                     }
                     if (id) {
-                        // Reemplaza el índice en el ID (e.g., id_articulos-0-producto)
                         id = id.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
                         $(this).attr('id', id);
                     }
                     if (htmlFor) {
-                        // Reemplaza el índice en el 'for' de las etiquetas
                         htmlFor = htmlFor.replace(new RegExp('^id_' + prefix + '-(\\d+)-'), 'id_' + prefix + '-' + index + '-');
                         $(this).attr('for', htmlFor);
                     }
@@ -260,8 +239,7 @@
             newFormRow.html(html);
 
             newFormRow.removeAttr('id').removeAttr('style');
-            
-            // Limpiar valores (para evitar que el template tenga valores por defecto)
+
             newFormRow.find('input:not([type="hidden"]), select').val('');
 
             $container.append(newFormRow); 
@@ -270,22 +248,20 @@
 
             newFormRow.find('.producto-select').first().focus();
             
-            // Actualizar índices después de agregar para asegurar la continuidad
             updateFormIndices();
         });
 
-        // Lógica para QUITAR FILA (para filas nuevas con botón 'Quitar')
+        // Lógica para QUITAR FILA btn
         $container.on('click', '.remove-form-row', function(e) {
             e.preventDefault();
             
             var $row = $(this).closest('.dynamic-form-row');
             $row.remove();
             
-            // Reajustar índices
             updateFormIndices();
         });
 
-        // Lógica para marcar filas existentes para eliminación (checkbox DELETE)
+        // Lógica para marcar filas existentes para eliminación del
         $container.on('change', 'input[type="checkbox"][id$="-DELETE"]', function() {
             var $row = $(this).closest('.dynamic-form-row');
             if ($(this).is(':checked')) {
@@ -293,11 +269,10 @@
             } else {
                 $row.removeClass('table-danger');
             }
-            // Importante: Volver a calcular el TOTAL_FORMS
             updateFormIndices();
         });
 
-        // --- Lógica AJAX (Para obtener precio automáticamente) ---
+        // --- Lógica AJAX precio auto
         $container.on('change', '.producto-select', function() {
             var $select = $(this);
             var productoId = $select.val(); 
@@ -313,7 +288,6 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        // Rellena el campo de precio con el valor de la respuesta AJAX
                         var precio = parseFloat(data.precio) || 0.00; 
                         $precioInput.val(precio.toFixed(2));
                     },
@@ -326,10 +300,7 @@
             }
         });
 
-        // Inicializar la tabla al cargar la página (para el caso de edición)
         updateFormIndices(); 
-        
-        // Aplicar estilo de error al cargar la página si DELETE está marcado
         $container.find('input[type="checkbox"][id$="-DELETE"]:checked').closest('.dynamic-form-row').addClass('table-danger');
     });
 </script>

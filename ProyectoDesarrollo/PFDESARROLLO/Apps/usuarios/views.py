@@ -7,6 +7,8 @@ from .models import Role, Usuario, UsuarioRole
 from .forms import UsuarioForm, RoleForm
 from django import forms 
 from django.contrib.auth.hashers import make_password
+
+
 #VISTAS DE USUARIOS
 class UsuarioListView(ListView):
     model = Usuario
@@ -33,7 +35,7 @@ class UsuarioCreateView(CreateView):
         return form
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        self.object = form.save() 
         
         usuario_creado = self.object
         rol_seleccionado = form.cleaned_data.get('rol_seleccionado')
@@ -44,7 +46,7 @@ class UsuarioCreateView(CreateView):
                 id_rol=rol_seleccionado
             )
         
-        return response
+        return super().form_valid(form)
 
 class UsuarioUpdateView(UpdateView):
 
@@ -97,7 +99,6 @@ def usuario_eliminar(request, pk):
     usuario.save()
     return redirect('usuarios:listausuarios')
 
-
 class UsuarioDetailView(DetailView):
     model = Usuario
     template_name = 'usuario_detail.html'
@@ -112,8 +113,6 @@ class RoleListView(ListView):
     
     def get_queryset(self):
         return Role.objects.filter(estado=1).order_by('descripcion') 
-
-
 
 class RoleCreateView(CreateView):
     model = Role

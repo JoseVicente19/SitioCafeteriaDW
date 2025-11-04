@@ -37,11 +37,19 @@
                     <h5 class="mt-2 text-dark">PEDIDOS</h5>
                 </a>
             </div>
+
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{% url 'reportes:dashboard' %}" class="d-block text-decoration-none p-4 rounded-3 shadow-lg bg-white h-100">
+                    <img src="{% static 'images/icono_reportes.png' %}" alt="Módulo Reportes" class="img-fluid mb-3" style="max-width: 80px;">
+                    <h5 class="mt-2 text-dark">Reportes</h5>
+                </a>
+            </div>
             
         </div>
 
         <hr class="my-5">
 
+        
         {% if user.is_authenticated %}
             <p class="text-center">
                 ¡Bienvenido de nuevo, 

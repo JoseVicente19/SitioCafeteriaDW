@@ -199,7 +199,6 @@ def pedido_eliminar(request, pk):
 
     pedido = get_object_or_404(Pedido, pk=pk)
     
-    # Solo cambiamos el estado
     pedido.estado = 0
     pedido.save()
 

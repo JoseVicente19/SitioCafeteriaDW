@@ -28,18 +28,58 @@ class Role(models.Model):
         verbose_name = 'Rol de Usuario'
         verbose_name_plural = 'Roles de Usuario'
 
-class Usuario(models.Model): 
-    USERNAME_FIELD = 'nombre_u'
+class UsuarioManager(BaseUserManager):
+    def create_user(self, nombre_u, correo, password=None, **extra_fields):
+        if not correo:
+            raise ValueError('El Usuario debe tener un correo electrónico')
+        if not nombre_u:
+            raise ValueError('El Usuario debe tener un nombre de usuario')
+            
+        correo = self.normalize_email(correo)
+        usuario = self.model(nombre_u=nombre_u, correo=correo, **extra_fields)
+        
+        usuario.set_password(password)
+        usuario.save(using=self._db)
+        return usuario
+
+    def create_superuser(self, nombre_u, correo, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('estado', 1) 
+        
+        return self.create_user(nombre_u, correo, password, **extra_fields)
+
+class Usuario(AbstractBaseUser, PermissionsMixin): 
+    
+    USERNAME_FIELD = 'nombre_u' 
     REQUIRED_FIELDS = ['correo'] 
     
     nombre_u = models.CharField(max_length=100, unique=True, verbose_name='Nombre de Usuario')
     correo = models.EmailField(max_length=100, unique=True, verbose_name='Correo Electrónico')
     password = models.CharField(max_length=255, verbose_name='Contraseña') 
+    
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    
     estado = models.IntegerField(default=1, verbose_name='Estado')
     nombre_p = models.CharField(max_length=75, null=True, blank=True, verbose_name='Nombre Personal')
     telefono = models.CharField(max_length=75, null=True, blank=True, verbose_name='Teléfono')
     creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Registro')
     
+    objects = UsuarioManager() 
+    
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
+
+    def get_full_name(self):
+        return self.nombre_p or self.nombre_u
+
+    def get_short_name(self):
+        return self.nombre_u
+
     def __str__(self):
         return self.correo
 
@@ -47,29 +87,6 @@ class Usuario(models.Model):
         db_table = 'usuario'
         verbose_name = 'Usuario del Sistema'
         verbose_name_plural = 'Usuarios del Sistema'
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password)
-
-    @property
-    def is_authenticated(self):
-        return True
-
-    @property
-    def is_anonymous(self):
-        return False
-
-    def is_active(self):
-        return self.estado == 1
-    
-    def is_staff(self):
-        return False
-
-    def has_perm(self, perm, obj=None):
-        return self.is_staff()
 
 
 class UsuarioRole(models.Model):

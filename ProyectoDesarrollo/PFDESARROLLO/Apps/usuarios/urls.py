@@ -21,6 +21,7 @@ from .views import RoleListView , RoleCreateView, RoleUpdateView, rol_eliminar
 
 app_name='usuarios'
 urlpatterns = [
+    #PATHS PARA USUARIOS
     path('', UsuarioListView.as_view(), name='listausuarios'),
     path('crear/', UsuarioCreateView.as_view(), name='crearusuario'),
     path('editar/ <int:pk>', UsuarioUpdateView.as_view(), name='editarusuario'),

@@ -36,7 +36,6 @@ class ProductoForm(forms.ModelForm):
 
     class Meta:
         model = Producto
-        # CAMBIO CLAVE: 'imagen' ELIMINADO de la lista de fields
         fields = ('id_categoria', 'nombre', 'descripcion', 'precio', 'stock', 'estado') 
         
         widgets = {
@@ -45,7 +44,6 @@ class ProductoForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Descripción breve del producto'}),
             'precio': forms.NumberInput(attrs={'placeholder': '0.00'}),
             'stock': forms.NumberInput(attrs={'placeholder': '0'}),
-            # WIDGET 'imagen' ELIMINADO
         }
         
     def __init__(self, *args, **kwargs):
