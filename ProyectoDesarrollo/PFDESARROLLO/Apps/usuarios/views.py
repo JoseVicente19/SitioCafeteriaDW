@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from .models import Role, Usuario, UsuarioRole
 from .forms import UsuarioForm, RoleForm
 from django import forms 
-
+from django.contrib.auth.hashers import make_password
 #VISTAS DE USUARIOS
 class UsuarioListView(ListView):
     model = Usuario

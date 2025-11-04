@@ -1,56 +1,69 @@
 {% extends 'baseusuarios.html' %} 
+{% load static %}
 
 {% block title %}Detalle de Usuario: {{ usuario.nombre_p }}{% endblock %}
 
 {% block contenido %}
-    <div class="container my-5">
-        <h1>Detalle de Usuario: {{ usuario.nombre_p }}</h1>
-        <hr>
+<section class="py-5 background-pattern bg-info"> 
+    <div class="container my-4">
+        
+        <h1 class="text-dark fw-bold mb-4">Detalle de Usuario: {{ usuario.nombre_p }}</h1>
+        <hr class="mb-5">
 
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                Información General
-            </div>
-            <div class="card-body">
-                <p><strong>ID de Usuario:</strong> {{ usuario.pk }}</p>
-                <p><strong>Nombre Completo:</strong> {{ usuario.nombre_p }}</p>
-                <p><strong>Correo Electrónico:</strong> {{ usuario.correo }}</p>
-                <p><strong>Fecha de Creación:</strong> {{ usuario.creacion|date:"d/m/Y H:i" }}</p>
-                <p>
-                    <strong>Estado:</strong> 
-                    {% if usuario.estado == 1 %}
-                        <span class="badge bg-success">Activo</span>
-                    {% else %}
-                        <span class="badge bg-danger">Inactivo</span>
-                    {% endif %}
-                </p>
-                
-                {# Si tienes campos adicionales como teléfono o dirección, agrégalos aquí #}
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4 shadow-lg border-0">
+                    <div class="card-header bg-primary text-white fw-bold fs-5">
+                        <i class="fas fa-user-circle me-2"></i> Información General
+                    </div>
+                    <div class="card-body bg-white">
+                        <p class="lead mb-2"><strong>ID de Usuario:</strong> {{ usuario.pk }}</p>
+                        <p class="lead mb-2"><strong>Nombre Completo:</strong> {{ usuario.nombre_p }}</p>
+                        <p class="lead mb-2"><strong>Nombre de Usuario:</strong> {{ usuario.nombre_u }}</p>
+                        <p class="lead mb-2"><strong>Correo Electrónico:</strong> {{ usuario.correo }}</p>
+                        <p class="lead mb-2"><strong>Teléfono:</strong> {{ usuario.telefono|default:"N/A" }}</p>
+                        <p class="lead mb-2"><strong>Fecha de Creación:</strong> {{ usuario.creacion|date:"d/m/Y H:i" }}</p>
+                        <p class="lead mb-2">
+                            <strong>Estado:</strong> 
+                            {% if usuario.estado == 1 %}
+                                <span class="badge bg-success py-2 px-3">Activo</span>
+                            {% else %}
+                                <span class="badge bg-danger py-2 px-3">Inactivo</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card mb-4 shadow-lg border-0">
+                    <div class="card-header bg-secondary text-dark fw-bold fs-5">
+                        <i class="fas fa-tasks me-2"></i> Roles Asignados
+                    </div>
+                    <div class="card-body bg-white">
+                        {% if usuario.usuariorole_set.all %}
+                            <ul class="list-group list-group-flush">
+                                {% for usuario_rol in usuario.usuariorole_set.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ usuario_rol.id_rol }}
+                                        <span class="badge bg-info text-dark rounded-pill">Asignado</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="alert alert-warning mb-0">Este usuario no tiene roles asignados.</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-2">
+                    <a href="{% url 'usuarios:listausuarios' %}" class="btn btn-secondary btn-lg me-2">
+                        <i class="fas fa-arrow-left me-1"></i> Volver al Listado
+                    </a>
+                    <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-edit me-1"></i> Editar Usuario
+                    </a>
+                </div>
             </div>
         </div>
-
-        <div class="card mb-4">
-            <div class="card-header bg-secondary text-dark">
-                Roles Asignados
-            </div>
-            <div class="card-body">
-                {% if usuario.usuariorole_set.all %}
-                    <ul class="list-group">
-                        {% for usuario_rol in usuario.usuariorole_set.all %}
-                            <li class="list-group-item">{{ usuario_rol.id_rol }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>Este usuario no tiene roles asignados.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <a href="{% url 'usuarios:listausuarios' %}" class="btn btn-secondary me-2">
-            Volver al Listado
-        </a>
-        <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning">
-            Editar Usuario
-        </a>
     </div>
+</section>
 {% endblock contenido %}

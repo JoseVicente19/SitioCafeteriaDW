@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import DireccionListView, DireccionCreateView, DireccionUpdateView
+from .views import DireccionListView, DireccionCreateView, DireccionUpdateView, dir_eliminar
 from .views import PedidoListView, PedidoCreateView, obtener_precio_producto, PedidoDetailView, PedidoUpdateView, pedido_eliminar
 
 
@@ -28,6 +28,7 @@ urlpatterns = [
     path('direcciones/', DireccionListView.as_view(), name='listadirecciones'),
     path('direcciones/crear/', DireccionCreateView.as_view(), name='creardirecciones'),
     path('direcciones/editar/<int:pk>/', DireccionUpdateView.as_view(), name='editardirecciones'), 
+     path('direcciones/<int:pk>/eliminar/', dir_eliminar, name='dir_eliminar'),
     
 
 #URLS DE PEDIDO

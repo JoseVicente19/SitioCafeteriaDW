@@ -1,47 +1,70 @@
 {% extends 'baseusuarios.html' %} 
+{% load static %}
 
 {% block title %}Detalle de Producto: {{ producto.nombre }}{% endblock %}
 
 {% block contenido %}
-    <div class="container my-5">
-        <h1>Detalle de Producto: {{ producto.nombre }}</h1>
-        <hr>
+<section class="py-5 background-pattern bg-info"> 
+    <div class="container my-4">
+        
+        <h1 class="text-dark fw-bold mb-4">Detalle de Producto: {{ producto.nombre }}</h1>
+        <hr class="mb-5">
 
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                Información del Producto
-            </div>
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ producto.pk }}</p>
-                <p><strong>Descripción:</strong> {{ producto.descripcion|default:"N/A" }}</p>
-                <p><strong>Categoría:</strong> {{ producto.id_categoria.nombre|default:"Sin Categoría" }}</p>
-                <p><strong>Precio:</strong> ${{ producto.precio|floatformat:2 }}</p>
-                <p><strong>Stock:</strong> {{ producto.stock }} unidades</p>
-                <p>
-                    <strong>Estado:</strong> 
-                    {% if producto.estado == 1 %}
-                        <span class="badge bg-success">ACTIVO</span>
-                    {% else %}
-                        <span class="badge bg-danger">INACTIVO</span>
-                    {% endif %}
-                </p>
-                <p><strong>Creado el:</strong> {{ producto.creacion|date:"d/m/Y H:i" }}</p>
-                
-                {% if producto.imagen %}
-                    <p><strong>Imagen:</strong></p>
-                    {# Ajusta la ruta si la imagen se sirve estáticamente #}
-                    <img src="{{ producto.imagen.url }}" alt="Imagen de {{ producto.nombre }}" style="max-width: 200px; height: auto;" class="img-thumbnail">
-                {% else %}
-                    <p><strong>Imagen:</strong> No disponible</p>
-                {% endif %}
-            </div>
-        </div>
+        <div class="row justify-content-center"> 
+            <div class="col-lg-8">
+                <div class="card mb-4 shadow-lg border-0">
+                    <div class="card-header bg-primary text-white fw-bold fs-5">
+                        <i class="fas fa-box me-2"></i> Información del Producto
+                    </div>
+                    <div class="card-body bg-white">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="lead mb-2"><strong>ID:</strong> {{ producto.pk }}</p>
+                                <p class="lead mb-2"><strong>Nombre:</strong> {{ producto.nombre }}</p>
+                                <p class="lead mb-2">
+                                    <strong>Categoría:</strong> 
+                                    <span class="badge bg-secondary text-dark py-1 px-2">{{ producto.id_categoria.nombre|default:"Sin Categoría" }}</span>
+                                </p>
+                                <p class="lead mb-2">
+                                    <strong>Precio:</strong> 
+                                    <span class="text-success fw-bold">${{ producto.precio|floatformat:2 }}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="lead mb-2">
+                                    <strong>Stock:</strong> 
+                                    {% if producto.stock > 0 %}
+                                        <span class="badge bg-primary py-2 px-3">{{ producto.stock }} unidades</span>
+                                    {% else %}
+                                        <span class="badge bg-danger py-2 px-3">Agotado</span>
+                                    {% endif %}
+                                </p>
+                                <p class="lead mb-2">
+                                    <strong>Estado:</strong> 
+                                    {% if producto.estado == 1 %}
+                                        <span class="badge bg-success py-2 px-3">ACTIVO</span>
+                                    {% else %}
+                                        <span class="badge bg-danger py-2 px-3">INACTIVO</span>
+                                    {% endif %}
+                                </p>
+                                <p class="lead mb-2"><strong>Creado el:</strong> {{ producto.creacion|date:"d/m/Y H:i" }}</p>
+                            </div>
+                        </div>
+                        <h5 class="mt-4 mb-2 fw-bold text-primary">Descripción:</h5>
+                        <p class="text-muted">{{ producto.descripcion|default:"No se proporcionó descripción." }}</p>
+                    </div>
+                </div>
 
-        <a href="{% url 'productos:listaproductos' %}" class="btn btn-secondary me-2">
-            Volver al Listado
-        </a>
-        <a href="{% url 'productos:editarproducto' pk=producto.pk %}" class="btn btn-warning">
-            Editar Producto
-        </a>
+                <div class="mt-4 pt-2">
+                    <a href="{% url 'productos:listaproductos' %}" class="btn btn-secondary btn-lg me-2">
+                        <i class="fas fa-arrow-left me-1"></i> Volver al Listado
+                    </a>
+                    <a href="{% url 'productos:editarproducto' pk=producto.pk %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-edit me-1"></i> Editar Producto
+                    </a>
+                </div>
+            </div>
+            </div>
     </div>
+</section>
 {% endblock contenido %}

@@ -22,6 +22,9 @@ class DireccionListView(ListView):
     template_name = 'direccion_list.html'
     context_object_name = 'direcciones_list'
 
+    def get_queryset(self):
+        return Direccion.objects.filter(estado=1)
+
 class DireccionCreateView(CreateView):
     model = Direccion
     form_class = DireccionForm
@@ -30,15 +33,8 @@ class DireccionCreateView(CreateView):
 
     def form_valid(self, form):
         
-        user_email = self.request.user.email 
-        
-        try:
-            usuario_instance = Usuario.objects.get(correo=user_email)
-        except Usuario.DoesNotExist:
-            return self.form_invalid(form) 
-            
-        form.instance.id_usuario = usuario_instance 
-        
+        form.instance.id_usuario = self.request.user 
+
         return super().form_valid(form)
 
 class DireccionUpdateView(UpdateView):
@@ -47,6 +43,14 @@ class DireccionUpdateView(UpdateView):
     template_name = 'actualizardireccion.html' 
     context_object_name = 'direccion' 
     success_url = reverse_lazy('pedidos:listadirecciones')
+
+def dir_eliminar(request, pk):
+    direccion = get_object_or_404(Direccion, pk=pk)
+    direccion.estado = 0
+    direccion.save()
+    return redirect(reverse('pedidos:listadirecciones'))
+
+
 
 class PedidoListView(ListView): 
     model = Pedido

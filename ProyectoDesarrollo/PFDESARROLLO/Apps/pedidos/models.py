@@ -61,7 +61,6 @@ class Direccion(models.Model):
 
 class Pedido(models.Model):
     ESTADO_OPCIONES = (
-        ('CARRITO', 'Carrito de Compras Activo'),
         ('PENDIENTE', 'Pendiente de Pago'),
         ('PROCESO', 'En Proceso'),
         ('ENVIADO', 'Enviado'),

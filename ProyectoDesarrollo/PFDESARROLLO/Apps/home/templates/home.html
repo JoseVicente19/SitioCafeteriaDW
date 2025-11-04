@@ -1,23 +1,65 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block contenido%}
-<h1>PAGINA HOME</h1>
+{% block contenido %}
 
-{% if user.is_authenticated %}
-    <p>
-        ¡Bienvenido de nuevo, 
-        
-        <strong>{{ user.nombre_p|default:user.nombre_u }}</strong>!
-    </p>
+<section class="py-5 background-pattern bg-info"> 
+    <div class="container">
+        
+        <h2 class="text-center mb-5">Módulos del sistema</h2>
 
-    <div class="mt-4">
-        <form method="post" action="{% url 'home:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-sm btn-danger">Cerrar Sesión</button>
-        </form>
-            </div>
-    
-{% else %}
-    <p>No has iniciado sesión.</p>
-{% endif %}
-{% endblock contenido%}
+        <div class="row justify-content-center text-center">
+            
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{% url 'usuarios:listausuarios' %}" class="d-block text-decoration-none p-4 rounded-3 shadow-lg bg-white h-100">
+                    <img src="{% static 'images/icono_usuario.png' %}" alt="Módulo Usuarios" class="img-fluid mb-3" style="max-width: 80px;">
+                    <h5 class="mt-2 text-dark">USUARIOS</h5>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{% url 'usuarios:listaroles' %}" class="d-block text-decoration-none p-4 rounded-3 shadow-lg bg-white h-100">
+                    <img src="{% static 'images/icono_roles.png' %}" alt="Módulo Roles" class="img-fluid mb-3" style="max-width: 80px;">
+                    <h5 class="mt-2 text-dark">ROLES</h5>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{% url 'productos:listaproductos' %}" class="d-block text-decoration-none p-4 rounded-3 shadow-lg bg-white h-100">
+                    <img src="{% static 'images/icono_menu.png' %}" alt="Módulo Productos" class="img-fluid mb-3" style="max-width: 80px;">
+                    <h5 class="mt-2 text-dark">PRODUCTOS</h5>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{% url 'pedidos:pedido_list' %}" class="d-block text-decoration-none p-4 rounded-3 shadow-lg bg-white h-100">
+                    <img src="{% static 'images/icono_pedidos.png' %}" alt="Módulo Pedidos" class="img-fluid mb-3" style="max-width: 80px;">
+                    <h5 class="mt-2 text-dark">PEDIDOS</h5>
+                </a>
+            </div>
+            
+        </div>
+
+        <hr class="my-5">
+
+        {% if user.is_authenticated %}
+            <p class="text-center">
+                ¡Bienvenido de nuevo, 
+                <strong>{{ user.nombre_p|default:user.nombre_u }}</strong>!
+            </p>
+
+            <div class="text-center mt-4">
+                <form method="post" action="{% url 'home:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">Cerrar Sesión</button>
+                </form>
+            </div>
+            
+        {% else %}
+            <p class="text-center">No has iniciado sesión.</p>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock contenido %}

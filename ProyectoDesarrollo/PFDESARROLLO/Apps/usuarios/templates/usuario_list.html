@@ -1,59 +1,75 @@
 {% extends 'baseusuarios.html' %}
 
 {% block contenido %}
-<div class="container my-5">
+<section class="py-5 background-pattern bg-info"> 
+    <div class="container my-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-dark fw-bold">LISTADO DE USUARIOS</h2>
+            
+            <a href="{% url 'usuarios:crearusuario' %}" class="btn btn-success btn-lg">
+                ➕ Crear Nuevo Usuario
+            </a>
+        </div>
 
-    <h2>LISTADO DE USUARIOS</h2>
+        {% if usuarios_list %}
+        <div class="table-responsive shadow-lg rounded-3 bg-white p-3">
+            <table class="table table-hover table-bordered align-middle mb-0">
+                <thead class="table-primary text-uppercase">
+                    <tr>
+                        <th>NOMBRE COMPLETO</th>
+                        <th>EMAIL</th>
+                        <th class="text-center">ESTADO</th>
+                        <th>ROLES</th>
+                        <th class="text-center">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
 
-    {% if usuarios_list %}
-    <table class="table table-striped" border="1">
-        <thead>
-            <tr>
-                <th>NOMBRE COMPLETO</th>
-                <th>EMAIL</th>
-                <th>ESTADO</th>
-                <th>ROLES</th>
-                <th>ACCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            {% for usuario in usuarios_list %}
-            <tr>
-                <td>{{ usuario.nombre_p }}</td>
-                <td>{{ usuario.correo }}</td>
-                <td>
-                    {% if usuario.estado == 1 %}
-                    <span class="badge bg-success">Activo</span>
-                    {% else %}
-                    <span class="badge bg-danger">Inactivo</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% for usuario_rol in usuario.usuariorole_set.all %}
-                    <span class="badge bg-info text-dark">{{ usuario_rol.id_rol }}</span>
-                    {% empty %}
-                    <span class="badge bg-secondary">Sin Rol</span>
+                    {% for usuario in usuarios_list %}
+                    <tr>
+                        <td>{{ usuario.nombre_p }}</td>
+                        <td>{{ usuario.correo }}</td>
+                        <td class="text-center">
+                            {% if usuario.estado == 1 %}
+                            <span class="badge bg-success py-2 px-3">Activo</span>
+                            {% else %}
+                            <span class="badge bg-danger py-2 px-3">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for usuario_rol in usuario.usuariorole_set.all %}
+                            <span class="badge bg-info text-dark me-1">{{ usuario_rol.id_rol }}</span>
+                            {% empty %}
+                            <span class="badge bg-secondary">Sin Rol</span>
+                            {% endfor %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'usuarios:usuario_detail' pk=usuario.pk %}" class="btn btn-info btn-sm text-white me-1">
+                                Detalle
+                            </a>
+                            <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning btn-sm me-1">
+                                Editar
+                            </a>
+                            <a href="{% url 'usuarios:usuario_eliminar' pk=usuario.pk %}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Desea desactivar a {{ usuario.nombre_p }}?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
                     {% endfor %}
-                </td>
-                <td>
-                    <a href="{% url 'usuarios:usuario_detail' pk=usuario.pk %}" class="btn btn-info btn-sm text-white">DETALLE</a>
-                    <a href="{% url 'usuarios:editarusuario' pk=usuario.pk %}" class="btn btn-warning btn-sm">EDITAR</a>
-                    <a href="{% url 'usuarios:usuario_eliminar' pk=usuario.pk %}" class="btn btn-danger btn-sm"
-                        onclick="return confirm('¿Desea desactivar a {{ usuario.nombre_p }}?');">
-                        ELIMINAR
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="alert alert-info">No hay usuarios registrados.</div>
-    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info py-3 shadow-sm bg-white" role="alert">
+            <h4 class="alert-heading">¡Ups!</h4>
+            <p class="mb-0">No hay usuarios registrados en el sistema. Presione **"Crear Nuevo Usuario"** para comenzar.</p>
+        </div>
+        {% endif %}
 
-    <h2 class="mt-4">CREAR USUARIO AQUÍ</h2>
-    <a href="{% url 'usuarios:crearusuario' %}" class="btn btn-success">CREAR</a>
+    </div>
+</section>
+<section class="py-3"></section>
 
-</div>
 {% endblock contenido %}
