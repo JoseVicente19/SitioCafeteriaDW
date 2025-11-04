@@ -80,6 +80,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.nombre_u
 
+    # MÉTODOS DE ROL PARA CONTROL DE ACCESO
+    def is_admin(self):
+        return self.usuariosrole_set.filter(id_rol__descripcion='Administrador', id_rol__estado=1).exists()
+
+    def is_staff_operaciones(self):
+        return self.usuariosrole_set.filter(id_rol__descripcion='Empleado', id_rol__estado=1).exists()
+
     def __str__(self):
         return self.correo
 

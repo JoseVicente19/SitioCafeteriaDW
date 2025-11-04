@@ -7,20 +7,14 @@
 
 <div class="container-fluid mt-4">
     <h1 class="mb-4">📊 Dashboard de Reportes de Ventas</h1>
-    
-    <div class="d-flex align-items-center mb-4">
-        <form method="post" action="{% url 'reportes:generar_reporte' %}" style="display: inline;">
+
+    <div class="mb-3">
+        <form method="post" action="{% url 'reportes:generar_reporte' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-lg">
-                Generar Reporte del Día
+            <button type="submit" class="btn btn-primary">
+                🔄 Generar reporte actual
             </button>
         </form>
-        
-        {% if messages %}
-            {% for message in messages %}
-                <span class="text-{{ message.tags }} ms-3">{{ message }}</span>
-            {% endfor %}
-        {% endif %}
     </div>
 
     {% if fecha_reporte %}
